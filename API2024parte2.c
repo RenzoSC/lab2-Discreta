@@ -1,5 +1,6 @@
 #include "API2024parte2.h"
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 
 //Greedy --> Complexity --> O( n * (d+d+d)) --> O(n * 3d)
@@ -10,22 +11,44 @@ u32 Greedy(Grafo G, u32 * Orden){
     u32 vert_painted =0;
     u32 total_colors =0;
     u32 delta = Delta(G)+1;
+    color used_colors[delta];
+    memset(used_colors, -1, sizeof(used_colors));
+    color color_topaint;
     for (u32 i = 0; i < nv; i++)
     {
         u32 vert_selected = Orden[i];
+        
         if (Color(vert_selected, G)!= 0)
         {
             return INT32_MAX;
         }
+
         u32 how_many_vecinos = Grado(vert_selected, G);
-        color used_colors[delta];
         for (u32 j = 0; j < how_many_vecinos; j++)
         {
             u32 vert_vecino = Vecino(j,vert_selected,G);
+            color color_vecino = Color(vert_vecino, G);
+            if (color_vecino!=0)                        //si es un color valido
+            {
+                used_colors[color_vecino]=i;            //lo marca como usado en esta iteración
+            }
         }
+        
+        for (u32 j = 0; j < delta; j++)    
+        {
+            if (used_colors[j]!= i)       //dentro de todos los vertices usados busca aquel
+            {                             //que no esté usado en esta iteración, ese será el color más chico
+                color_topaint = j+1;
+                break;
+            }
+        }
+        total_colors = total_colors<color_topaint? color_topaint:total_colors;  //actualizo la cantidad de colores q usé
+
+        AsignarColor(color_topaint,vert_selected, G);      //lo pinta
+        vert_painted++;                                 //actualizo la cantidad de vertices q pinté
     }
 
-    if (vert_painted != nv)
+    if (vert_painted != nv)          //reviso que haya pintado todos los vertices
     {
         return INT32_MAX;
     }
