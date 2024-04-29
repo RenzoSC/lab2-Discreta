@@ -69,32 +69,18 @@ typedef struct setSameColor {
     u32 size; //Tamaño Allocado para el Array
 } setSetColor;
 
-//Funcion para Inicializar el Arreglo de Vertices
-void initArray(setSetColor *a, u32 initialSize) {
-  a->vertices = malloc(initialSize * sizeof(u32));
-  a->lenVertices = 0;
-  a->color = 0;
-  a->añadido = false;
-  a->mGrande = 0;
-  a->mChica = 0;
-  a->size = initialSize;
-}
+void initArray(setSetColor *a, u32 initialSize);
+void insertArray(setSetColor *a, u32 element);
+void freeArray(setSetColor *a);
 
-//Funcion para Insertar en el Arreglo de Vertices
-void insertArray(setSetColor *a, u32 element) {
-   if (a->lenVertices == a->size) {
-    a->size *= 2;
-    a->vertices = realloc(a->vertices, a->size * sizeof(u32));
-  }
-  a->vertices[a->lenVertices++] = element;
-}
+//Estructuras y Funciones Auxiliares para ordenar la lista de setSetColor
+typedef bool (*Comparador)(setSetColor, setSetColor);
 
-//Funcion para Liberar el Arreglo de Vertices
-void freeArray(setSetColor *a) {
-  free(a->vertices);
-  a->vertices = NULL;
-  a->lenVertices = a->size = 0;
-}
+bool goes_before_by_len(setSetColor x, setSetColor y);
+unsigned int partition(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
+void quick_sort_rec(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
+void quick_sort(setSetColor a[], unsigned int length, Comparador comp);
+
 
 char GulDukat(Grafo G,u32* Orden){
     //Creamos la lista con la Maxima cantidad de Colores Posibles.
@@ -178,7 +164,7 @@ char ElimGarak(Grafo G, u32 *Orden){
     {
         u32 vert_selected = Orden[i];
         color col = Color(vert_selected, G); 
-        if (col > maxColor){ maxColor = col; }
+        maxColor = col>maxColor?col:maxColor;
         if (col == 0)
         {
             //Grafo no Coloreado Previamente
@@ -190,7 +176,7 @@ char ElimGarak(Grafo G, u32 *Orden){
 
 
     //Ordenar Lista por Lista[i].lenvertices de menor a mayor MILANESA
-
+    quick_sort(lista, delta, goes_before_by_len);
     //Si te pones a pensar solo pasa por las partes de añadir 1 vez por vertice asi que queda
     //O n
     //No hay necesidad de ver el arreglo pasado el maximo de colores utilizado
@@ -247,6 +233,84 @@ char ElimGarak(Grafo G, u32 *Orden){
     return '0';
 }
 
+//Funcion para Inicializar el Arreglo de Vertices
+void initArray(setSetColor *a, u32 initialSize) {
+  a->vertices = malloc(initialSize * sizeof(u32));
+  a->lenVertices = 0;
+  a->color = 0;
+  a->añadido = false;
+  a->mGrande = 0;
+  a->mChica = 0;
+  a->size = initialSize;
+}
+
+//Funcion para Insertar en el Arreglo de Vertices
+void insertArray(setSetColor *a, u32 element) {
+   if (a->lenVertices == a->size) {
+    a->size *= 2;
+    a->vertices = realloc(a->vertices, a->size * sizeof(u32));
+  }
+  a->vertices[a->lenVertices++] = element;
+}
+
+//Funcion para Liberar el Arreglo de Vertices
+void freeArray(setSetColor *a) {
+  free(a->vertices);
+  a->vertices = NULL;
+  a->lenVertices = a->size = 0;
+}
+
+//Funciones de ordenación
+
+bool goes_before_by_len(setSetColor x, setSetColor y){
+    return x.lenVertices >= y.lenVertices;
+}
+
+void swap(setSetColor a[], int x, int y){
+    setSetColor z = a[x];
+    a[x] = a[y];
+    a[y]= z;
+}
+
+unsigned int partition(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp) {
+    unsigned int i, j,ppiv;
+    ppiv = izq;
+    i= izq +1;
+    j= der;
+    while (i<=j)
+    {
+        if (comp(a[i],a[ppiv]))
+        {
+            i+=1;
+        }else if(comp(a[ppiv], a[j])){
+            j-=1;
+        }else if(comp(a[ppiv], a[i]) && comp(a[j], a[ppiv])){
+            swap(a,i,j);
+            i+=1;
+            j-=1;
+        }
+    }
+    swap(a,ppiv,j);
+    ppiv =j;
+    return ppiv;
+}
+
+void quick_sort_rec(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp) {
+    unsigned int ppiv;
+    if (der > izq){
+        ppiv = partition(a, izq, der, comp);
+        if(ppiv!=0){
+            quick_sort_rec(a, izq, ppiv-1, comp);
+        }
+        quick_sort_rec(a, ppiv+1, der, comp);
+    }
+}
+
+void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
+    quick_sort_rec(a, 0u, (length == 0u) ? 0u : length - 1u, comp);
+}
+
+
     /*
     To do List para ElimGarak (* significa hecho; - significa no hecho)
    * Creamos un Array de SetsDeVerticesSameColor de Delta + 1 de tamaño. O 1
@@ -254,7 +318,7 @@ char ElimGarak(Grafo G, u32 *Orden){
    * Ademas llevamos la cuenta de cual es el Color mas Alto usado hasta entonces. O n
    * SetsDeVerticesSameColor: con Color, Lista de Vertices, Cardinal de esa Lista y un Bool de Añadido
 
-   - Ordeno la lista por lenvertices MILANESA
+   * Ordeno la lista por lenvertices MILANESA
 
    * añado a los que no sean el 1 o el 2 llevando la cuenta de cuantos ya añadi. O n
    * cuando no queden mas añado el 2 y el 1 y termina. O n
