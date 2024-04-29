@@ -114,8 +114,9 @@ char GulDukat(Grafo G,u32* Orden){
         lista[col-1].mChica =lista[col-1].mChica > grad? grad:lista[col-1].mChica;
     }
 
-
-    //Ordeno la lista por disibile por 4(M) -> Par(M+m) -> Impar(m) MILANESA
+    //O nlogn
+    //Ordeno la lista por disibile por 4(M) -> Par(M+m) -> Impar(m)
+    quick_sort(lista, delta, goes_before_by_Mm);
 
     //Si te pones a pensar solo pasa por las partes de añadir 1 vez por vertice asi que queda
     //O n
@@ -126,12 +127,13 @@ char GulDukat(Grafo G,u32* Orden){
     {
         if(lista[i].añadido == false)
         {
-            for (u32 j = va; j < (va + lista[i].lenVertices); j++)
+            u32 bva = va; //Base desde donde se añaden los nuevos Vertices
+            for (u32 j = bva; j < (bva + lista[i].lenVertices); j++)
             {
+                Orden[j] = lista[i].vertices[j - bva];
                 va++;
-                Orden[j] = lista[i].vertices[j - va];
-                lista[i].añadido = true;
             }
+            lista[i].añadido = true;
         }
     }
 
@@ -174,9 +176,10 @@ char ElimGarak(Grafo G, u32 *Orden){
         lista[col-1].color = col;
     }
 
-
-    //Ordenar Lista por Lista[i].lenvertices de menor a mayor MILANESA
+    //O nlogn
+    //Ordenar Lista por Lista[i].lenvertices de menor a mayor
     quick_sort(lista, delta, goes_before_by_len);
+
     //Si te pones a pensar solo pasa por las partes de añadir 1 vez por vertice asi que queda
     //O n
     //No hay necesidad de ver el arreglo pasado el maximo de colores utilizado
@@ -191,12 +194,13 @@ char ElimGarak(Grafo G, u32 *Orden){
         if(lista[i].color == 2){c2 = i; continue;}
         if(lista[i].añadido == false)
         {
-            for (u32 j = va; j < (va + lista[i].lenVertices); j++)
+            u32 bva = va; //Base desde donde se añaden los nuevos Vertices
+            for (u32 j = bva; j < (bva + lista[i].lenVertices); j++)
             {
+                Orden[j] = lista[i].vertices[j - bva];
                 va++;
-                Orden[j] = lista[i].vertices[j - va];
-                lista[i].añadido = true;
             }
+            lista[i].añadido = true;
         }
     }
 
@@ -207,8 +211,8 @@ char ElimGarak(Grafo G, u32 *Orden){
         {
             va++;
             Orden[j] = lista[c2].vertices[j - va];
-            lista[c2].añadido = true;
         }
+        lista[c2].añadido = true;
     }
 
     //Añadir c1
@@ -218,8 +222,8 @@ char ElimGarak(Grafo G, u32 *Orden){
         {
             va++;
             Orden[j] = lista[c1].vertices[j - va];
-            lista[c1].añadido = true;
         }
+        lista[c1].añadido = true;
     }
 
     //O n
@@ -263,7 +267,27 @@ void freeArray(setSetColor *a) {
 //Funciones de ordenación
 
 bool goes_before_by_len(setSetColor x, setSetColor y){
-    return x.lenVertices >= y.lenVertices;
+    return x.lenVertices <= y.lenVertices;
+}
+
+bool goes_before_by_Mm(setSetColor x, setSetColor y){
+    if(x.color % 4 == 0)
+    {
+        if(y.color % 4 == 0)
+        {
+            return x.mGrande >= y.mGrande;
+        }
+        return true;
+    }
+    if(x.color % 2 == 0)
+    {
+        if(y.color % 2 == 0)
+        {
+            return (x.mGrande + x.mChica) >= (y.mGrande + y.mChica);
+        }
+        return true;
+    }
+    return x.mChica >= y.mChica;
 }
 
 void swap(setSetColor a[], int x, int y){
@@ -318,7 +342,7 @@ void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
    * Ademas llevamos la cuenta de cual es el Color mas Alto usado hasta entonces. O n
    * SetsDeVerticesSameColor: con Color, Lista de Vertices, Cardinal de esa Lista y un Bool de Añadido
 
-   * Ordeno la lista por lenvertices MILANESA
+   * Ordeno la lista por lenvertices. O nlogn
 
    * añado a los que no sean el 1 o el 2 llevando la cuenta de cuantos ya añadi. O n
    * cuando no queden mas añado el 2 y el 1 y termina. O n
@@ -335,9 +359,9 @@ void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
    * Ademas llevamos la cuenta de cual es el Color mas Alto usado hasta entonces. O n
    * SetsDeVerticesSameColor: con Color, Lista de Vertices, Cardinal de esa Lista y un Bool de Añadido y M y n 
 
-   - Ordeno la lista por disibile por 4(M) -> Par(M+m) -> Impar(m) MILANESA
+   * Ordeno la lista por disibile por 4(M) -> Par(M+m) -> Impar(m) MILANESA
 
-   - Añado a los colores divisibles por 4, ordenados por M, luego a los pares por M + m y finalmente a los impares por m. O -
+   * Añado a los colores divisibles por 4, ordenados por M, luego a los pares por M + m y finalmente a los impares por m. O nlogn
 
    * Libero la memoria de las estructuras auxiliares O n
 
@@ -345,11 +369,8 @@ void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
     */
 
     /*
-    Faltaria Implementar un sort (Preferiblemente en O n) y los requisitos de comparacion, 
-    estaria bueno que se pudiera usar el mismo sort y pasarle cual condicion usar.
-    ya sea que tome un booleano de argumento o de alguna forma para no tener que repetir codigo, 
-    habria que ver cual algoritmo de ordenacion es mas rapido para este caso en particular. 
-    
+    el ">":
+
     para ElimGarak ">" seria "lista[i].lenvertices > lista[j].lenvertices"
 
     en cambio para GulDukat es mas complicado, ">" seria algo como
@@ -359,7 +380,5 @@ void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
     "elif lista[i].color div 2 y lista[j].color tambien, se ordenan por lista[x].mGrande + lista[x].mChica"
     "elif lista[i].color no div  y lista[j].color tampoco, se ordenan por lista[x].mChica"
 
-    Nota: Todo esto se puede hacer en teoria con el qsort de C, si vas a los docs, 
-    esta remil sobrecargado y hay muchas formas de usarlo, entre ellas pasarle condiciones
-    asi que nomas habria que ver bien como hacer eso y ya quedaria nlogn
+    Sabemos que QuickSort es O nlogn
     */
