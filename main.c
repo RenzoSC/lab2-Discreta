@@ -70,11 +70,11 @@ u32 Iterar50Veces(color *colores, Grafo G, u32 *Orden, color *Arr)
     {
         if (GulDukat(G,Orden) == '1'){printf("Critical Gul Dukat Error\n"); return 1;}
         *colores = Greedy(G,Orden);
-        printf("Gul Dukat N° %u: %u\n",i, *colores);
+        printf("Gul Dukat N° %u: %u\n",(i+1), *colores);
         
         if (ElimGarak(G,Orden) == '1'){printf("Critical Elim Garak Error\n"); return 1;}
         *colores = Greedy(G,Orden);
-        printf("Elim Garak N° %u: %u\n",i, *colores);
+        printf("Elim Garak N° %u: %u\n",(i+1), *colores);
     }
     //Ahora Arr tiene el Ultimo Coloreo y colores la cantidad de Colores.
     ExtraerColores(G,Arr);
@@ -91,11 +91,11 @@ u32 Iterar500Veces(Grafo G, u32 *Orden)
         {
             if (GulDukat(G,Orden) == '1'){printf("Critical Gul Dukat Error\n"); return 1;}
             colores = Greedy(G,Orden);
-            printf("Random Gul Dukat N° %u: %u\n",i, colores);
+            printf("Random Gul Dukat N° %u: %u\n",(i+1), colores);
         }else{
             if (ElimGarak(G,Orden) == '1'){printf("Critical Elim Garak Error\n"); return 1;}
             colores = Greedy(G,Orden);
-            printf("Random Elim Garak N° %u: %u\n",i, colores);
+            printf("Random Elim Garak N° %u: %u\n",(i+1), colores);
         }
     }
     return 0;
@@ -117,7 +117,9 @@ int main()
     printf("Orden Natural: %u\n\n", colores[0]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(Iterar50Veces(&colores[0],g,orden,arr[0])){return 1;}
+    if(colores[0] == INT32_MAX){ printf("Invalid Order\n");}
+    else if(Iterar50Veces(&colores[0],g,orden,arr[0])){return 1;}
+
 
     //Orden Anti Natural Inicial
     arr[1] = (color*) malloc(nv * sizeof(color));
@@ -126,13 +128,42 @@ int main()
     printf("Orden Anti-Natural: %u\n\n", colores[1]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(Iterar50Veces(&colores[1],g,orden,arr[1])){return 1;}
+    if(colores[1] == INT32_MAX){ printf("Invalid Order\n");}
+    else if(Iterar50Veces(&colores[1],g,orden,arr[1])){return 1;}
 
-    //
-    //
-    //Faltan los Otros 3 Ordenes
-    //
-    //
+
+    //Orden Par Impar Inicial
+    arr[2] = (color*) malloc(nv * sizeof(color));
+    OrdenParImpar(nv,orden);
+    colores[2] = Greedy(g,orden);
+    printf("Orden Par Impar: %u\n\n", colores[2]);
+
+    //Iterar GD -> Greedy -> EG -> Greedy 50 veces
+    if(colores[2] == INT32_MAX){ printf("Invalid Order\n");}
+    else if(Iterar50Veces(&colores[2],g,orden,arr[2])){return 1;}
+
+
+    //Orden Grado Inicial
+    arr[3] = (color*) malloc(nv * sizeof(color));
+    OrdenParImpar(nv,orden);
+    colores[3] = Greedy(g,orden);
+    printf("Orden Grado: %u\n\n", colores[3]);
+
+    //Iterar GD -> Greedy -> EG -> Greedy 50 veces
+    if(colores[3] == INT32_MAX){ printf("Invalid Order\n");}
+    else if(Iterar50Veces(&colores[3],g,orden,arr[3])){return 1;}
+
+
+    //Orden Invalido Inicial
+    arr[4] = (color*) malloc(nv * sizeof(color));
+    OrdenParImpar(nv,orden);
+    colores[4] = Greedy(g,orden);
+    printf("Orden Par Impar: %u\n\n", colores[4]);
+
+    //Iterar GD -> Greedy -> EG -> Greedy 50 veces
+    if(colores[4] == INT32_MAX){ printf("Invalid Order\n");}
+    else if(Iterar50Veces(&colores[4],g,orden,arr[4])){return 1;}
+
 
     //Comparar Coloreos y Repintar
     u32 minC = INT32_MAX; //Minimo Color
@@ -145,6 +176,10 @@ int main()
             minI = i;
         }
     }
+    if(minC == INT32_MAX){
+        printf("No Valid Orders\n");
+        return 1;
+    }
     ImportarColores(arr[minI],g);
 
     //Libero los Array de Coloreos
@@ -156,48 +191,4 @@ int main()
     free(orden);
     DestruirGrafo(g);
     return 0;
-}
-
-void swap(vertData a[], int x, int y){
-    vertData z = a[x];
-    a[x] = a[y];
-    a[y]= z;
-}
-
-unsigned int partition(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int i, j,ppiv;
-    ppiv = izq;
-    i= izq +1;
-    j= der;
-    while (i<=j)
-    {
-        if (comp(a[i],a[ppiv]))
-        {
-            i+=1;
-        }else if(comp(a[ppiv], a[j])){
-            j-=1;
-        }else if(comp(a[ppiv], a[i]) && comp(a[j], a[ppiv])){
-            swap(a,i,j);
-            i+=1;
-            j-=1;
-        }
-    }
-    swap(a,ppiv,j);
-    ppiv =j;
-    return ppiv;
-}
-
-void quick_sort_rec(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int ppiv;
-    if (der > izq){
-        ppiv = partition(a, izq, der, comp);
-        if(ppiv!=0){
-            quick_sort_rec(a, izq, ppiv-1, comp);
-        }
-        quick_sort_rec(a, ppiv+1, der, comp);
-    }
-}
-
-void quick_sort(vertData a[], unsigned int length, Comparador comp) {
-    quick_sort_rec(a, 0u, (length == 0u) ? 0u : length - 1u, comp);
 }
