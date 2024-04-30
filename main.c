@@ -158,7 +158,7 @@ int main()
     arr[4] = (color*) malloc(nv * sizeof(color));
     OrdenInvalido(nv,orden);
     colores[4] = Greedy(g,orden);
-    printf("Orden Par Impar: %u\n\n", colores[4]);
+    printf("Orden Invalido: %u\n\n", colores[4]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
     if(colores[4] == INT32_MAX){ printf("Invalid Order\n");}
