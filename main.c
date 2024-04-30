@@ -117,7 +117,7 @@ int main()
     printf("Orden Natural: %u\n\n", colores[0]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(colores[0] == INT32_MAX){ printf("Invalid Order\n");}
+    if(colores[0] == INT32_MAX){ printf("Invalid Order\n"); OrdenNatural(nv,orden);} //Usamos Orden Natural que Sabemos es un Orden Valido
     else if(Iterar50Veces(&colores[0],g,orden,arr[0])){return 1;}
 
 
@@ -128,7 +128,7 @@ int main()
     printf("Orden Anti-Natural: %u\n\n", colores[1]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(colores[1] == INT32_MAX){ printf("Invalid Order\n");}
+    if(colores[1] == INT32_MAX){ printf("Invalid Order\n"); OrdenNatural(nv,orden);} //Usamos Orden Natural que Sabemos es un Orden Valido
     else if(Iterar50Veces(&colores[1],g,orden,arr[1])){return 1;}
 
 
@@ -139,7 +139,7 @@ int main()
     printf("Orden Par Impar: %u\n\n", colores[2]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(colores[2] == INT32_MAX){ printf("Invalid Order\n");}
+    if(colores[2] == INT32_MAX){ printf("Invalid Order\n"); OrdenNatural(nv,orden);} //Usamos Orden Natural que Sabemos es un Orden Valido
     else if(Iterar50Veces(&colores[2],g,orden,arr[2])){return 1;}
 
 
@@ -150,7 +150,7 @@ int main()
     printf("Orden Grado: %u\n\n", colores[3]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(colores[3] == INT32_MAX){ printf("Invalid Order\n");}
+    if(colores[3] == INT32_MAX){ printf("Invalid Order\n"); OrdenNatural(nv,orden);} //Usamos Orden Natural que Sabemos es un Orden Valido
     else if(Iterar50Veces(&colores[3],g,orden,arr[3])){return 1;}
 
 
@@ -161,7 +161,7 @@ int main()
     printf("Orden Invalido: %u\n\n", colores[4]);
 
     //Iterar GD -> Greedy -> EG -> Greedy 50 veces
-    if(colores[4] == INT32_MAX){ printf("Invalid Order\n");}
+    if(colores[4] == INT32_MAX){printf("Invalid Order\n"); OrdenNatural(nv,orden);} //Usamos Orden Natural que Sabemos es un Orden Valido
     else if(Iterar50Veces(&colores[4],g,orden,arr[4])){return 1;}
 
 
