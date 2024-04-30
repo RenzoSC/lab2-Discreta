@@ -5,6 +5,21 @@
 #include "API2024parte2.h"
 #include "APIG24.h"
 
+
+typedef struct vertData {
+    u32 indice;
+    u32 grade;
+}vertData;
+typedef bool (*Comparador)(vertData, vertData);
+
+unsigned int partition(vertData a[], unsigned int izq, unsigned int der, Comparador comp);
+void quick_sort_rec(vertData a[], unsigned int izq, unsigned int der, Comparador comp);
+void quick_sort(vertData a[], unsigned int length, Comparador comp);
+bool goes_before_by_grade(vertData x, vertData y){
+    return x.grade <= y.grade;
+
+}
+
 ////////////////////////Funciones de Orden Inicial///////////////////////////
 void OrdenNatural(u32 n, u32 *Orden) {
     for (u32 i = 0; i < n; i++){ Orden[i] = i; }
@@ -13,11 +28,40 @@ void OrdenAntiNatural(u32 n, u32 *Orden) {
     for (u32 i = 0; i < n; i++){ Orden[i] = n - 1 - i; }
 }
 
-//
-//
-//Faltan los Otros 3 Ordenes
-//
-//
+void OrdenParImpar(u32 n, u32 *Orden){
+    u32 cota_sup = n%2==0? n/2: (n+1)/2;
+    u32 start = n%2==0? n-2: n-1;
+    for (u32 i = 0; i < cota_sup; i++)
+    {
+        Orden[i]=start;
+        start-=2;
+    }
+    start = 1;
+    for (u32 i = cota_sup; i < n; i++)
+    {
+        Orden[i]=start;
+        start+=2;
+    }
+    
+}
+
+void OrdenByGrade(u32 n, u32 *Orden, Grafo G){
+    vertData vertices[n];
+    for (u32 i = 0; i < n; i++)
+    {
+        vertices[i].indice=i;
+        vertices[i].grade = Grado(i,G);
+    }
+    quick_sort(vertices, n, goes_before_by_grade);
+    for (u32 i = 0; i < n; i++)
+    {
+        Orden[i] = vertices[i].indice;
+    }  
+}
+
+void OrdenInvalido(u32 n, u32 *Orden){
+    for (u32 i = 0; i < n; i++){Orden[i]=1;}
+}
 
 ////////////////////////Funciones Iterativas///////////////////////////
 u32 Iterar50Veces(color *colores, Grafo G, u32 *Orden, color *Arr)
@@ -112,4 +156,48 @@ int main()
     free(orden);
     DestruirGrafo(g);
     return 0;
+}
+
+void swap(vertData a[], int x, int y){
+    vertData z = a[x];
+    a[x] = a[y];
+    a[y]= z;
+}
+
+unsigned int partition(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
+    unsigned int i, j,ppiv;
+    ppiv = izq;
+    i= izq +1;
+    j= der;
+    while (i<=j)
+    {
+        if (comp(a[i],a[ppiv]))
+        {
+            i+=1;
+        }else if(comp(a[ppiv], a[j])){
+            j-=1;
+        }else if(comp(a[ppiv], a[i]) && comp(a[j], a[ppiv])){
+            swap(a,i,j);
+            i+=1;
+            j-=1;
+        }
+    }
+    swap(a,ppiv,j);
+    ppiv =j;
+    return ppiv;
+}
+
+void quick_sort_rec(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
+    unsigned int ppiv;
+    if (der > izq){
+        ppiv = partition(a, izq, der, comp);
+        if(ppiv!=0){
+            quick_sort_rec(a, izq, ppiv-1, comp);
+        }
+        quick_sort_rec(a, ppiv+1, der, comp);
+    }
+}
+
+void quick_sort(vertData a[], unsigned int length, Comparador comp) {
+    quick_sort_rec(a, 0u, (length == 0u) ? 0u : length - 1u, comp);
 }
