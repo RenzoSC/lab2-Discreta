@@ -11,26 +11,40 @@ u32 Greedy(Grafo G, u32 * Orden){
     u32 vert_painted =0;
     u32 total_colors =0;
     u32 delta = Delta(G)+1;
+    
     color used_colors[delta];
     memset(used_colors, -1, sizeof(used_colors));
+
+    bool already_colored[nv];                           //esto lo hacemos para poder correr greedy sobre grafos ya pintados
+    memset(already_colored,false,sizeof(already_colored));   //asi vemos q vert fueron pintados en esta corrida de Greedy
+
     color color_topaint;
     for (u32 i = 0; i < nv; i++)
     {
         u32 vert_selected = Orden[i];
-
-        if (Color(vert_selected, G)!= 0)
+        if (already_colored[vert_selected])
         {
             return INT32_MAX;
+        }
+        if (i==0)
+        {
+            color_topaint=1;
+            total_colors=1;
+            AsignarColor(color_topaint,vert_selected, G);
+            used_colors[0]=i;
+            vert_painted++;
+            already_colored[vert_selected]=true;
+            continue;
         }
 
         u32 how_many_vecinos = Grado(vert_selected, G);
         for (u32 j = 0; j < how_many_vecinos; j++)
         {
             u32 vert_vecino = Vecino(j,vert_selected,G);
-            color color_vecino = Color(vert_vecino, G);
-            if (color_vecino!=0)                        //si es un color valido
-            {
-                used_colors[color_vecino]=i;            //lo marca como usado en esta iteración
+            if (already_colored[vert_vecino])                        //si el vertice ya fue pintado
+            {   
+                color color_vecino = Color(vert_vecino, G);
+                used_colors[color_vecino-1]=i;            //lo marca como usado en esta iteración
             }
         }
         
@@ -43,8 +57,8 @@ u32 Greedy(Grafo G, u32 * Orden){
             }
         }
         total_colors = total_colors<color_topaint? color_topaint:total_colors;  //actualizo la cantidad de colores q usé
-
         AsignarColor(color_topaint,vert_selected, G);      //lo pinta
+        already_colored[vert_selected]=true;                //lo marco como pintado
         vert_painted++;                                 //actualizo la cantidad de vertices q pinté
     }
 
@@ -108,6 +122,7 @@ char GulDukat(Grafo G,u32* Orden){
             return '1';
         }
         insertArray(&lista[col-1], vert_selected);
+        
         lista[col-1].color = col;
         u32 grad = Grado(vert_selected, G);
 
@@ -145,7 +160,9 @@ char GulDukat(Grafo G,u32* Orden){
     }
 
     //Chequeamos Errores y Finalizamos
-    if(va != nv){return '1';}
+    if(va != nv){
+        printf("no agregados todos pa va:%d , nv:%d\n", va,nv);
+        return '1';}
     return '0';
 }
 
@@ -208,10 +225,11 @@ char ElimGarak(Grafo G, u32 *Orden){
     //Añadir c2
     if(lista[c2].añadido == false && maxColor > 1)
     {
-        for (u32 j = va; j < (va + lista[c2].lenVertices); j++)
+        u32 bva = va;
+        for (u32 j = bva; j < (bva + lista[c2].lenVertices); j++)
         {
+            Orden[j] = lista[c2].vertices[j - bva];
             va++;
-            Orden[j] = lista[c2].vertices[j - va];
         }
         lista[c2].añadido = true;
     }
@@ -219,10 +237,11 @@ char ElimGarak(Grafo G, u32 *Orden){
     //Añadir c1
     if(lista[c1].añadido == false)
     {
-        for (u32 j = va; j < (va + lista[c1].lenVertices); j++)
+        u32 bva = va;
+        for (u32 j = bva; j < (bva + lista[c1].lenVertices); j++)
         {
+            Orden[j] = lista[c1].vertices[j - bva];
             va++;
-            Orden[j] = lista[c1].vertices[j - va];
         }
         lista[c1].añadido = true;
     }
@@ -255,7 +274,8 @@ void insertArray(setSetColor *a, u32 element) {
     a->size *= 2;
     a->vertices = realloc(a->vertices, a->size * sizeof(u32));
   }
-  a->vertices[a->lenVertices++] = element;
+  a->vertices[a->lenVertices] = element;
+  a->lenVertices++;
 }
 
 //Funcion para Liberar el Arreglo de Vertices
@@ -268,27 +288,44 @@ void freeArray(setSetColor *a) {
 //Funciones de ordenación
 
 bool goes_before_by_len(setSetColor x, setSetColor y){
-    return x.lenVertices <= y.lenVertices;
+    if (x.lenVertices ==0)
+    {
+        return false;
+    }if (y.lenVertices==0)
+    {
+        return true;
+    }else{
+        return x.lenVertices <= y.lenVertices;
+    }
 }
 
 bool goes_before_by_Mm(setSetColor x, setSetColor y){
-    if(x.color % 4 == 0)
+    if (x.lenVertices ==0)
     {
-        if(y.color % 4 == 0)
-        {
-            return x.mGrande >= y.mGrande;
-        }
-        return true;
-    }
-    if(x.color % 2 == 0)
+        return false;
+    }if (y.lenVertices==0)
     {
-        if(y.color % 2 == 0)
-        {
-            return (x.mGrande + x.mChica) >= (y.mGrande + y.mChica);
-        }
         return true;
+    }else{
+        if(x.color % 4 == 0)
+        {
+            if(y.color % 4 == 0)
+            {
+                return x.mGrande >= y.mGrande;
+            }
+            return true;
+        }
+        if(x.color % 2 == 0)
+        {
+            if(y.color % 2 == 0)
+            {
+                return (x.mGrande + x.mChica) >= (y.mGrande + y.mChica);
+            }
+            return true;
+        }
+        return x.mChica >= y.mChica;
     }
-    return x.mChica >= y.mChica;
+    
 }
 
 void swap(setSetColor a[], int x, int y){

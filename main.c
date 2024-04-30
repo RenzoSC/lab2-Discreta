@@ -27,7 +27,7 @@ u32 Iterar50Veces(color *colores, Grafo G, u32 *Orden, color *Arr)
         if (GulDukat(G,Orden) == '1'){printf("Critical Gul Dukat Error\n"); return 1;}
         *colores = Greedy(G,Orden);
         printf("Gul Dukat N° %u: %u\n",i, *colores);
-
+        
         if (ElimGarak(G,Orden) == '1'){printf("Critical Elim Garak Error\n"); return 1;}
         *colores = Greedy(G,Orden);
         printf("Elim Garak N° %u: %u\n",i, *colores);
@@ -35,6 +35,7 @@ u32 Iterar50Veces(color *colores, Grafo G, u32 *Orden, color *Arr)
     //Ahora Arr tiene el Ultimo Coloreo y colores la cantidad de Colores.
     ExtraerColores(G,Arr);
     printf("\n");
+    return 0;
 }
 
 u32 Iterar500Veces(Grafo G, u32 *Orden)
@@ -53,6 +54,7 @@ u32 Iterar500Veces(Grafo G, u32 *Orden)
             printf("Random Elim Garak N° %u: %u\n",i, colores);
         }
     }
+    return 0;
 }
 
 int main()
