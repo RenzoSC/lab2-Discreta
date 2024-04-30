@@ -145,7 +145,7 @@ int main()
 
     //Orden Grado Inicial
     arr[3] = (color*) malloc(nv * sizeof(color));
-    OrdenParImpar(nv,orden);
+    OrdenByGrade(nv,orden,g);
     colores[3] = Greedy(g,orden);
     printf("Orden Grado: %u\n\n", colores[3]);
 
@@ -156,7 +156,7 @@ int main()
 
     //Orden Invalido Inicial
     arr[4] = (color*) malloc(nv * sizeof(color));
-    OrdenParImpar(nv,orden);
+    OrdenInvalido(nv,orden);
     colores[4] = Greedy(g,orden);
     printf("Orden Par Impar: %u\n\n", colores[4]);
 
@@ -168,7 +168,7 @@ int main()
     //Comparar Coloreos y Repintar
     u32 minC = INT32_MAX; //Minimo Color
     u32 minI = 0; //Minimo Indice
-    for (u32 i = 0; i < 2; i++) //CAMBIAR 2 POR 5 CUANDO SE IMPLEMENTEN LOS DEMAS ORDENES MILANESA
+    for (u32 i = 0; i < 5; i++)
     {
         if(minC > colores[i])
         {
@@ -183,7 +183,7 @@ int main()
     ImportarColores(arr[minI],g);
 
     //Libero los Array de Coloreos
-    for (u32 i = 0; i < 2; i++){free(arr[i]);}  //CAMBIAR 2 POR 5 CUANDO SE IMPLEMENTEN LOS DEMAS ORDENES MILANESA
+    for (u32 i = 0; i < 5; i++){free(arr[i]);}
 
     printf("Iteraciones Random Partiendo del Orden %u\n\n", (minI + 1));
     if(Iterar500Veces(g,orden)){return 1;}
