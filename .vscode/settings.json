@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "api2024parte2.h": "c",
+        "stdio.h": "c",
+        "stdint.h": "c",
+        "vertice.h": "c",
+        "string.h": "c",
+        "stdbool.h": "c",
+        "apig24.h": "c"
+    }
+}

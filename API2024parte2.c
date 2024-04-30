@@ -17,7 +17,7 @@ u32 Greedy(Grafo G, u32 * Orden){
     for (u32 i = 0; i < nv; i++)
     {
         u32 vert_selected = Orden[i];
-        
+
         if (Color(vert_selected, G)!= 0)
         {
             return INT32_MAX;
@@ -77,6 +77,7 @@ void freeArray(setSetColor *a);
 typedef bool (*Comparador)(setSetColor, setSetColor);
 
 bool goes_before_by_len(setSetColor x, setSetColor y);
+bool goes_before_by_Mm(setSetColor x, setSetColor y);
 unsigned int partition(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
 void quick_sort_rec(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
 void quick_sort(setSetColor a[], unsigned int length, Comparador comp);

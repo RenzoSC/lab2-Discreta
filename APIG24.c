@@ -153,7 +153,7 @@ color Color(u32 i,Grafo G){
 
 u32 Vecino(u32 j,u32 i,Grafo G){
     assert(G!=NULL);
-    if ((i>=NumeroDeVertices(G)) || (i<=NumeroDeVertices(G) && j>=grado_v(i,G)) || j >= grado_v(i,G))
+    if ((i>=NumeroDeVertices(G)) || (i<=NumeroDeVertices(G) && j>=Grado(i,G)) || j >= Grado(i,G))
     {
         return UINT32_MAX;
     }
@@ -180,6 +180,6 @@ void ExtraerColores(Grafo G,color* Color){
 void ImportarColores(color* Color,Grafo  G){
     assert(G!=NULL);
     for (u32 i = 0; i < G->num_vertices; i++) {
-        asignar_color_v(Color[i], i, G);
+        AsignarColor(Color[i], i, G);
     }
 }
