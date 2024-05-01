@@ -11,10 +11,10 @@ u32 Greedy(Grafo G, u32 * Orden){
     u32 vert_painted =0;
     u32 total_colors =0;
     u32 delta = Delta(G)+1;
-    color * used_colors = calloc(delta, sizeof(color));
+    color * used_colors = malloc(delta * sizeof(color));
     memset(used_colors, 0, delta*sizeof(color));
 
-    bool *already_colored = calloc(nv, sizeof(bool));    //esto lo hacemos para poder correr greedy sobre grafos ya pintados
+    bool *already_colored = malloc(nv * sizeof(bool));    //esto lo hacemos para poder correr greedy sobre grafos ya pintados
     memset(already_colored,false,nv*sizeof(bool));   //asi vemos q vert fueron pintados en esta corrida de Greedy
 
     color color_topaint;
@@ -23,6 +23,8 @@ u32 Greedy(Grafo G, u32 * Orden){
         u32 vert_selected = Orden[i];
         if (already_colored[vert_selected])
         {
+            free(already_colored);
+            free(used_colors);
             return INT32_MAX;
         }
         if (i==0)
@@ -63,6 +65,8 @@ u32 Greedy(Grafo G, u32 * Orden){
 
     if (vert_painted != nv)          //reviso que haya pintado todos los vertices
     {
+        free(already_colored);
+        free(used_colors);
         return INT32_MAX;
     }
     free(already_colored);
@@ -99,7 +103,7 @@ char GulDukat(Grafo G,u32* Orden){
     u32 delta = Delta(G)+1;
     u32 nv = NumeroDeVertices(G);
     color maxColor = 0;
-    setSetColor lista [delta];
+    setSetColor* lista = malloc(delta * sizeof(setSetColor));
     //O n
     //Seria mejor si ya supieramos "r" (Cuantos colores son)
     for (u32 i = 0; i < delta; i++) {
@@ -116,6 +120,7 @@ char GulDukat(Grafo G,u32* Orden){
         if (col == 0)
         {
             //Grafo no Coloreado Previamente
+            free(lista);
             return '1';
         }
         insertArray(&lista[col-1], vert_selected);
@@ -155,6 +160,7 @@ char GulDukat(Grafo G,u32* Orden){
     for (u32 i = 0; i < delta; i++) {
         freeArray(&lista[i]);
     }
+    free(lista);
 
     //Chequeamos Errores y Finalizamos
     if(va != nv){
@@ -168,7 +174,7 @@ char ElimGarak(Grafo G, u32 *Orden){
     u32 delta = Delta(G)+1;
     u32 nv = NumeroDeVertices(G);
     color maxColor = 0;
-    setSetColor lista [delta];
+    setSetColor* lista = malloc(delta * sizeof(setSetColor));
     //O n
     //Seria mejor si ya supieramos "r" (Cuantos colores son)
     for (u32 i = 0; i < delta; i++) {
@@ -185,6 +191,7 @@ char ElimGarak(Grafo G, u32 *Orden){
         if (col == 0)
         {
             //Grafo no Coloreado Previamente
+            free(lista);
             return '1';
         }
         insertArray(&lista[col-1], vert_selected);
@@ -247,6 +254,7 @@ char ElimGarak(Grafo G, u32 *Orden){
     for (u32 i = 0; i < delta; i++) {
         freeArray(&lista[i]);
     }
+    free(lista);
 
     //Chequeamos Errores y Finalizamos
     if(va != nv){return '1';}
