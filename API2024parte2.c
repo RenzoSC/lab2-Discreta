@@ -88,13 +88,10 @@ void insertArray(setSetColor *a, u32 element);
 void freeArray(setSetColor *a);
 
 //Estructuras y Funciones Auxiliares para ordenar la lista de setSetColor
-typedef bool (*Comparador)(setSetColor, setSetColor);
+typedef int (*Comparador)(setSetColor, setSetColor);
 
-bool goes_before_by_len(setSetColor x, setSetColor y);
-bool goes_before_by_Mm(setSetColor x, setSetColor y);
-unsigned int partition(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
-void quick_sort_rec(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp);
-void quick_sort(setSetColor a[], unsigned int length, Comparador comp);
+int goes_before_by_len(const void *x, const void *y);
+int goes_before_by_Mm(const void *x, const void *y);
 
 
 char GulDukat(Grafo G,u32* Orden){
@@ -132,8 +129,8 @@ char GulDukat(Grafo G,u32* Orden){
 
     //O nlogn
     //Ordeno la lista por disibile por 4(M) -> Par(M+m) -> Impar(m)
-    quick_sort(lista, delta, goes_before_by_Mm);
-
+    qsort(lista,delta, sizeof(setSetColor), goes_before_by_Mm);
+    
     //Si te pones a pensar solo pasa por las partes de añadir 1 vez por vertice asi que queda
     //O n
     //No hay necesidad de ver el arreglo pasado el maximo de colores utilizado
@@ -196,8 +193,7 @@ char ElimGarak(Grafo G, u32 *Orden){
 
     //O nlogn
     //Ordenar Lista por Lista[i].lenvertices de menor a mayor
-    quick_sort(lista, delta, goes_before_by_len);
-
+    qsort(lista,delta, sizeof(setSetColor), goes_before_by_len);
     //Si te pones a pensar solo pasa por las partes de añadir 1 vez por vertice asi que queda
     //O n
     //No hay necesidad de ver el arreglo pasado el maximo de colores utilizado
@@ -286,90 +282,88 @@ void freeArray(setSetColor *a) {
 }
 
 //Funciones de ordenación
+int goes_before_by_len(const void *x, const void *y){
+    const setSetColor *dataA = (const setSetColor *)x;
+    const setSetColor *dataB = (const setSetColor *)y;
 
-bool goes_before_by_len(setSetColor x, setSetColor y){
-    if (x.lenVertices ==0)
+    if (dataA->lenVertices ==0)
     {
-        return false;
-    }if (y.lenVertices==0)
+        return 1;
+    }if (dataB->lenVertices==0)
     {
-        return true;
+        return -1;
     }else{
-        return x.lenVertices <= y.lenVertices;
+        if (dataA->lenVertices < dataB->lenVertices)
+        {
+            return -1;
+        }else if (dataB->lenVertices > dataA->lenVertices)
+        {
+            return 1;
+        }else{
+            return 0;
+        }
     }
 }
 
-bool goes_before_by_Mm(setSetColor x, setSetColor y){
-    if (x.lenVertices ==0)
+int goes_before_by_Mm(const void *x, const void *y){
+    const setSetColor *dataA = (const setSetColor *)x;
+    const setSetColor *dataB = (const setSetColor *)y;
+    if (dataA->lenVertices ==0)
     {
-        return false;
-    }if (y.lenVertices==0)
+        return 1;
+    }if (dataB->lenVertices==0)
     {
-        return true;
+        return -1;
     }else{
-        if(x.color % 4 == 0)
+        if(dataA->color % 4 == 0)
         {
-            if(y.color % 4 == 0)
+            if(dataB->color % 4 == 0)
             {
-                return x.mGrande >= y.mGrande;
+                if (dataA->mGrande > dataB->mGrande)
+                {
+                    return -1;
+                }else if(dataA->mGrande < dataB->mGrande){
+                    return 1;
+                }else{
+                    return 0;
+                }
             }
-            return true;
+            return -1;
         }
-        if(x.color % 2 == 0)
+        if(dataA->color % 2 == 0)
+        {   
+            if (dataB->color %4 ==0)
+            {
+                return 1;
+            }
+            
+            if(dataB->color % 2 == 0)
+            {
+                if ((dataA->mGrande + dataA->mChica) > (dataB->mGrande + dataB->mChica))
+                {
+                    return -1;
+                }else if((dataA->mGrande + dataA->mChica) < (dataB->mGrande + dataB->mChica)){
+                    return 1;
+                }else{
+                    return 0;
+                }
+            }
+            return -1;
+        }
+        if (dataB->color %2 !=0)
         {
-            if(y.color % 2 == 0)
+            if (dataA->mChica > dataB->mChica)
             {
-                return (x.mGrande + x.mChica) >= (y.mGrande + y.mChica);
+                return -1;
+            }else if (dataA->mChica < dataB->mChica){
+                return 1;
+            }else{
+                return 0;
             }
-            return true;
         }
-        return x.mChica >= y.mChica;
+        return 1;
     }
     
-}
-
-void swap(setSetColor a[], int x, int y){
-    setSetColor z = a[x];
-    a[x] = a[y];
-    a[y]= z;
-}
-
-unsigned int partition(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int i, j,ppiv;
-    ppiv = izq;
-    i= izq +1;
-    j= der;
-    while (i<=j)
-    {
-        if (comp(a[i],a[ppiv]))
-        {
-            i+=1;
-        }else if(comp(a[ppiv], a[j])){
-            j-=1;
-        }else if(comp(a[ppiv], a[i]) && comp(a[j], a[ppiv])){
-            swap(a,i,j);
-            i+=1;
-            j-=1;
-        }
-    }
-    swap(a,ppiv,j);
-    ppiv =j;
-    return ppiv;
-}
-
-void quick_sort_rec(setSetColor a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int ppiv;
-    if (der > izq){
-        ppiv = partition(a, izq, der, comp);
-        if(ppiv!=0){
-            quick_sort_rec(a, izq, ppiv-1, comp);
-        }
-        quick_sort_rec(a, ppiv+1, der, comp);
-    }
-}
-
-void quick_sort(setSetColor a[], unsigned int length, Comparador comp) {
-    quick_sort_rec(a, 0u, (length == 0u) ? 0u : length - 1u, comp);
 }
 
 

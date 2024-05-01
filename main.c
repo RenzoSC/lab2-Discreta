@@ -10,59 +10,20 @@ typedef struct vertData {
     u32 indice;
     u32 grade;
 }vertData;
-typedef bool (*Comparador)(vertData, vertData);
 
-unsigned int partition(vertData a[], unsigned int izq, unsigned int der, Comparador comp);
-void quick_sort_rec(vertData a[], unsigned int izq, unsigned int der, Comparador comp);
-void quick_sort(vertData a[], unsigned int length, Comparador comp);
-bool goes_before_by_grade(vertData x, vertData y){
-    return x.grade <= y.grade;
+int goes_before_by_grade(const void *x, const void *y){
+    const vertData *dataA = (const vertData *)x;
+    const vertData *dataB = (const vertData *)y;
 
-}
-
-//Qsort 2 (Igual que el de APO2024parte 2 pero con vertData en lugar de set de colores)
-void swap2(vertData a[], int x, int y){
-    vertData z = a[x];
-    a[x] = a[y];
-    a[y]= z;
-}
-
-unsigned int partition2(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int i, j,ppiv;
-    ppiv = izq;
-    i= izq +1;
-    j= der;
-    while (i<=j)
+    if (dataA->grade < dataB->grade)
     {
-        if (comp(a[i],a[ppiv]))
-        {
-            i+=1;
-        }else if(comp(a[ppiv], a[j])){
-            j-=1;
-        }else if(comp(a[ppiv], a[i]) && comp(a[j], a[ppiv])){
-            swap2(a,i,j);
-            i+=1;
-            j-=1;
-        }
+        return 1;
+    }else if (dataB->grade < dataA->grade)
+    {
+        return -1;
+    }else{
+        return 0;
     }
-    swap2(a,ppiv,j);
-    ppiv =j;
-    return ppiv;
-}
-
-void quick_sort_rec2(vertData a[], unsigned int izq, unsigned int der, Comparador comp) {
-    unsigned int ppiv;
-    if (der > izq){
-        ppiv = partition2(a, izq, der, comp);
-        if(ppiv!=0){
-            quick_sort_rec2(a, izq, ppiv-1, comp);
-        }
-        quick_sort_rec2(a, ppiv+1, der, comp);
-    }
-}
-
-void quick_sort2(vertData a[], unsigned int length, Comparador comp) {
-    quick_sort_rec2(a, 0u, (length == 0u) ? 0u : length - 1u, comp);
 }
 
 ////////////////////////Funciones de Orden Inicial///////////////////////////
@@ -97,7 +58,7 @@ void OrdenByGrade(u32 n, u32 *Orden, Grafo G){
         vertices[i].indice=i;
         vertices[i].grade = Grado(i,G);
     }
-    quick_sort2(vertices, n, goes_before_by_grade);
+    qsort(vertices, n, sizeof(vertData), goes_before_by_grade);
     for (u32 i = 0; i < n; i++)
     {
         Orden[i] = vertices[i].indice;
