@@ -11,12 +11,11 @@ u32 Greedy(Grafo G, u32 * Orden){
     u32 vert_painted =0;
     u32 total_colors =0;
     u32 delta = Delta(G)+1;
-    
-    color used_colors[delta];
-    memset(used_colors, -1, sizeof(used_colors));
+    color * used_colors = calloc(delta, sizeof(color));
+    memset(used_colors, 0, delta*sizeof(color));
 
-    bool already_colored[nv];                           //esto lo hacemos para poder correr greedy sobre grafos ya pintados
-    memset(already_colored,false,sizeof(already_colored));   //asi vemos q vert fueron pintados en esta corrida de Greedy
+    bool *already_colored = calloc(nv, sizeof(bool));    //esto lo hacemos para poder correr greedy sobre grafos ya pintados
+    memset(already_colored,false,nv*sizeof(bool));   //asi vemos q vert fueron pintados en esta corrida de Greedy
 
     color color_topaint;
     for (u32 i = 0; i < nv; i++)
@@ -66,7 +65,8 @@ u32 Greedy(Grafo G, u32 * Orden){
     {
         return INT32_MAX;
     }
-
+    free(already_colored);
+    free(used_colors);
     return total_colors;
 
 }
